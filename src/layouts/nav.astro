@@ -1,0 +1,24 @@
+---
+import "../assets/global.css";
+---
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <body>
+    <div class="flex flex-col h-screen">
+      <nav class="">
+        <div class="flex flex-nowrap justify-between p-5">
+          <a href="/" class="text-3xl font-bold text-white">Flashcards</a>
+          <div class="flex flex-nowrap gap-5">
+            <a href="/create" class="text-white hover:underline">Create</a>
+            <a href="/account" class="text-white hover:underline">Account</a>
+          </div>
+        </div>
+      </nav>
+      <slot />
+    </div>
+  </body>
+</html>

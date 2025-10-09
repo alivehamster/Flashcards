@@ -1,0 +1,87 @@
+---
+import Navbar from "../layouts/nav.astro";
+---
+
+<Navbar>
+  <div class="flex flex-col items-center justify-center">
+    <h1 class="text-5xl font-bold text-white text-center mt-10">
+      Create a New Deck:
+    </h1>
+    <div id="card-container" class="flex flex-col w-full h-full items-center">
+    </div>
+    <div class="mb-10">
+      <button
+        id="new-card"
+        type="submit"
+        class="bg-white text-black p-3 rounded hover:bg-blue-600 cursor-pointer"
+        >New Card
+      </button>
+      <button
+        id="create-deck"
+        type="submit"
+        class="bg-blue-500 text-white p-3 rounded hover:bg-blue-600 cursor-pointer"
+      >
+        Create Deck
+      </button>
+    </div>
+  </div>
+</Navbar>
+
+<script>
+  let cardCount = 1;
+
+  const newCardButton = document.getElementById("new-card");
+  const cardContainer = document.getElementById("card-container");
+
+  createCard(cardCount);
+
+  newCardButton?.addEventListener("click", () => {
+    cardCount++;
+    createCard(cardCount);
+  });
+
+  function createCard(num: number) {
+    const newCard = document.createElement("div");
+    newCard.className =
+      "flex flex-col w-2/3 min-h-40 p-3 m-3 bg-gray-400 rounded-2xl card";
+    newCard.innerHTML = `
+        <div>
+          <h1>${num}</h1>
+        </div>
+        <div class="flex w-full h-full justify-between">
+          <textarea
+            placeholder="Side 1"
+            class="p-3 mr-2 min-h-24 w-1/2 rounded-2xl bg-gray-600 resize-none overflow-hidden text-white"
+            rows="3"></textarea>
+          <textarea
+            placeholder="Side 2"
+            class="p-3 ml-2 min-h-24 w-1/2 rounded-2xl bg-gray-600 resize-none overflow-hidden text-white"
+            rows="3"></textarea>
+        </div>
+      `;
+
+    const textareas = newCard.querySelectorAll("textarea");
+    textareas.forEach((textarea) => {
+      textarea.addEventListener("input", () => autoResize(textarea));
+    });
+
+    cardContainer?.appendChild(newCard);
+  }
+
+  function autoResize(textarea: HTMLTextAreaElement) {
+    textarea.style.height = "auto";
+    textarea.style.height = textarea.scrollHeight + "px";
+  }
+
+  document.getElementById("create-deck")?.addEventListener("click", () => {
+    const cards = document.querySelectorAll(".card");
+    const deck = Array.from(cards).map((card) => {
+      const textareas = card.querySelectorAll("textarea");
+      return {
+        side1: (textareas[0] as HTMLTextAreaElement).value,
+        side2: (textareas[1] as HTMLTextAreaElement).value,
+      };
+    });
+    console.log(deck);
+  });
+</script>
