@@ -7,6 +7,16 @@ import Navbar from "../layouts/nav.astro";
     <h1 class="text-5xl font-bold text-white text-center mt-10">
       Create a New Deck:
     </h1>
+    <div class="flex p-3 m-3 w-2/3 bg-gray-400 rounded-2xl">
+      <input
+        id="deck-title"
+        type="text"
+        placeholder="Deck Title"
+        class="p-3 h-10 w-full rounded-2xl bg-gray-600 text-white text-3xl"
+      />
+
+    </div>
+
     <div id="card-container" class="flex flex-col w-full h-full items-center">
     </div>
     <div class="mb-10">
@@ -28,6 +38,8 @@ import Navbar from "../layouts/nav.astro";
 </Navbar>
 
 <script>
+  import { actions } from 'astro:actions';
+
   let cardCount = 1;
 
   const newCardButton = document.getElementById("new-card");
@@ -83,5 +95,11 @@ import Navbar from "../layouts/nav.astro";
       };
     });
     console.log(deck);
+    const deckTitle = (document.getElementById("deck-title") as HTMLInputElement)?.value;
+    actions.createDeck({
+      title: deckTitle,
+      deck: deck,
+    });
+
   });
 </script>

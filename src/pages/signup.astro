@@ -1,0 +1,76 @@
+---
+export const prerender = false;
+
+import Navbar from "../layouts/nav.astro";
+
+const account = await Astro.session?.get("userid");
+
+if (account) {
+  return Astro.redirect("/");
+}
+---
+
+<Navbar>
+  <div class="flex justify-center items-center fixed inset-0 flex-col">
+    <div class="bg-gray-600 p-2 py-0 rounded-xl w-1/2">
+      <div>
+        <h1 class="text-5xl m-6 text-center font-poppins">Sign Up</h1>
+        <h2 id="error" class="text-red-600 m-2 text-center"></h2>
+      </div>
+      <form @submit.prevent="post" class="flex flex-col justify-center">
+        <input
+          class="rounded-xl m-2 h-12 text-3xl text-center bg-white text-black"
+          placeholder="Email"
+          id="email"
+          required
+          maxlength="1000"
+        />
+        <input
+          class="rounded-xl m-2 h-12 text-3xl text-center bg-white text-black"
+          placeholder="Username"
+          id="username"
+          required
+          maxlength="50"
+        />
+        <input
+          class="rounded-xl m-2 h-12 text-3xl text-center bg-white text-black"
+          placeholder="Password"
+          type="password"
+          id="password"
+          required
+          maxlength="1000"
+        />
+        <button
+          type="submit"
+          class="rounded-xl m-2 bg-blue-500 font-rubik text-4xl text-center text-white h-12 hover:bg-blue-700 cursor-pointer"
+        >
+          Submit
+        </button>
+      </form>
+      <a href="/login" class="text-white hover:underline">Login</a>
+    </div>
+  </div>
+</Navbar>
+
+<script>
+  import { actions } from "astro:actions";
+
+  const form = document.querySelector("form");
+  const errorDisplay = document.getElementById("error");
+
+  form?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const email = (document.getElementById("email") as HTMLInputElement)?.value;
+    const username = (document.getElementById("username") as HTMLInputElement)
+      ?.value;
+    const password = (document.getElementById("password") as HTMLInputElement)
+      ?.value;
+    const response = await actions.signup({ email, username, password });
+    if (response.data?.status === "successful") {
+      window.location.href = "/";
+    } else if (response.data?.status === "error") {
+      errorDisplay!.textContent = response.data?.message || "An error occurred";
+    }
+  });
+</script>

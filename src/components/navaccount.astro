@@ -1,0 +1,20 @@
+---
+import { pool } from "../libs/db";
+
+const user = await Astro.session?.get("userid");
+let username = "Login";
+let href = "/login";
+
+if (user) {
+  const [rows] = await pool.execute(
+    "SELECT Username FROM Accounts WHERE UserId = ?",
+    [user]
+  );
+  const accounts = rows as any[];
+  username = accounts.length > 0 ? accounts[0].Username : "Login";
+  
+  href = "/account";
+}
+---
+
+<a href={href} class="text-white hover:underline">{username}</a>
