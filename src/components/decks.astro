@@ -1,0 +1,32 @@
+---
+import { pool } from "../libs/db";
+
+interface Deck {
+  DeckId: number;
+  UserId: number;
+  Title: string;
+  Length: number;
+  CreatedAt: Date;
+}
+
+const userid = await Astro.session?.get("userid");
+let decks: Deck[] = [];
+if (userid) {
+  const [rows] = await pool.execute(
+    "SELECT DeckId, Title, Length FROM Decks WHERE UserId = ?",
+    [userid]
+  );
+  decks = rows as Deck[];
+}
+---
+
+<div class="flex w-full flex-col justify-center items-center my-10">
+  {
+    decks.map((deck) => (
+      <div class="flex flex-col p-2 bg-gray-400 rounded-xl w-5/6 h-20 justify-center my-2">
+        <h2 class="text-gray-700 text-sm">Count: {deck.Length}</h2>
+        <h1 class="text-black text-5xl">{deck.Title}</h1>
+      </div>
+    ))
+  }
+</div>

@@ -14,16 +14,9 @@ if (account) {
   <div class="flex justify-center items-center fixed inset-0 flex-col pointer-events-none">
     <div class="bg-gray-600 p-2 py-0 rounded-xl w-1/2 pointer-events-auto">
       <div>
-        <h1 class="text-5xl m-6 text-center font-poppins">Sign Up</h1>
+        <h1 class="text-5xl m-6 text-center font-poppins">Login</h1>
       </div>
       <form @submit.prevent="post" class="flex flex-col justify-center">
-        <input
-          class="rounded-xl m-2 h-12 text-3xl text-center bg-white text-black"
-          placeholder="Email"
-          id="email"
-          required
-          maxlength="1000"
-        />
         <input
           class="rounded-xl m-2 h-12 text-3xl text-center bg-white text-black"
           placeholder="Username"
@@ -46,26 +39,25 @@ if (account) {
           Submit
         </button>
       </form>
-      <a href="/login" class="text-white hover:underline">Login</a>
+      <a href="/signup" class="text-white hover:underline">Sign Up</a>
     </div>
   </div>
 </Navbar>
 
 <script>
   import { actions } from "astro:actions";
-  import { createNotification } from "../assets/createNotification";
+import { createNotification } from "../assets/createNotification";
 
   const form = document.querySelector("form");
 
   form?.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const email = (document.getElementById("email") as HTMLInputElement)?.value;
     const username = (document.getElementById("username") as HTMLInputElement)
       ?.value;
     const password = (document.getElementById("password") as HTMLInputElement)
       ?.value;
-    const response = await actions.signup({ email, username, password });
+    const response = await actions.login({ username, password });
     if (response.data?.status === "successful") {
       window.location.href = "/";
     } else if (response.data?.status === "error") {

@@ -8,7 +8,7 @@ import evalidator from "email-validator";
 export const server = {
   createDeck: defineAction({
     input: z.object({
-      title: z.string(),
+      title: z.string().min(1),
       deck: z.array(
         z.object({
           side1: z.string(),
@@ -16,12 +16,36 @@ export const server = {
         })
       ),
     }),
-    handler: async (input) => {
-      pool.execute("INSERT INTO Decks (UserId, Title) VALUES (?, ?)", [
-        1,
-        input.title,
-      ]);
-      return "success";
+    handler: async (input, context) => {
+      try {
+        if(input.title.length > 500) {
+          return { status: "error", message: "Title too long" };
+        }
+        const userId = await context.session?.get("userid");
+        if (!userId) {
+          return { status: "error", message: "Not authenticated" };
+        }
+
+        const [deckResult] = await pool.execute(
+          "INSERT INTO Decks (UserId, Title, Length) VALUES (?, ?, ?)",
+          [userId, input.title, input.deck.length]
+        );
+        const deckInsertResult = deckResult as any;
+        const deckId = deckInsertResult.insertId;
+
+        for (let i = 0; i < input.deck.length; i++) {
+          const card = input.deck[i];
+          await pool.execute(
+            "INSERT INTO Cards (DeckId, Position, Front, Back) VALUES (?, ?, ?, ?)",
+            [deckId, i + 1, card.side1, card.side2]
+          );
+        }
+
+        return { status: "success" };
+      } catch (error) {
+        console.warn(error);
+        return { status: "error", message: "Failed to create deck" };
+      }
     },
   }),
 
@@ -83,7 +107,7 @@ export const server = {
   }),
   login: defineAction({
     input: z.object({
-      username: z.string().min(1).max(50),
+      username: z.string().min(1).max(1000),
       password: z.string().min(1).max(1000),
     }),
     handler: async (input, context) => {
@@ -97,10 +121,14 @@ export const server = {
         const [rows] = await pool.execute(query, [input.username]);
         const accounts = rows as any[];
 
-        acc = accounts.length > 0 ? accounts[0] : "none";
+        if (accounts.length > 0) {
+          acc = accounts[0];
+        } else {
+          return { status: "error", message: "Invalid Username or Password" };
+        }
 
-        if (await bcrypt.compare(input.password, acc.password)) {
-          context.session?.set("userid", acc._id.toString());
+        if (await bcrypt.compare(input.password, acc.PasswordHash)) {
+          context.session?.set("userid", acc.UserId.toString());
           return {
             status: "successful",
           };

@@ -12,9 +12,28 @@ if (user) {
   );
   const accounts = rows as any[];
   username = accounts.length > 0 ? accounts[0].Username : "Login";
-  
+
   href = "/account";
 }
 ---
 
+{
+  user && (
+    <button id="logout" class="text-white hover:underline hover:cursor-pointer">
+      logout
+    </button>
+  )
+}
+
 <a href={href} class="text-white hover:underline">{username}</a>
+
+<script>
+  import { actions } from "astro:actions";
+  const logoutButton = document.getElementById("logout");
+  if (logoutButton) {
+    logoutButton.addEventListener("click", async () => {
+      await actions.logout();
+      window.location.href = "/";
+    });
+  }
+</script>

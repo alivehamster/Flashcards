@@ -30,6 +30,7 @@ async function initializeDatabase() {
         DeckId INT AUTO_INCREMENT PRIMARY KEY,
         UserId INT NOT NULL,
         Title VARCHAR(255) NOT NULL,
+        Length INT DEFAULT 0,
         CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (UserId) REFERENCES Accounts(UserId) ON DELETE CASCADE
       )

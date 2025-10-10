@@ -1,7 +1,11 @@
 ---
 import Navbar from '../layouts/nav.astro';
+import Decks from '../components/decks.astro';
 ---
 
 <Navbar >
-<h1 class="text-5xl font-bold text-white text-center mt-10">Your Decks</h1>
+  <div class="flex flex-col items-center justify-center">
+    <h1 class="text-5xl font-bold text-white text-center mt-10">Your Decks:</h1>
+    <Decks server:defer />
+  </div>
 </Navbar>
