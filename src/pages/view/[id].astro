@@ -1,0 +1,33 @@
+---
+export const prerender = false;
+import { pool } from "../../libs/db";
+
+import Navbar from "../../layouts/nav.astro";
+import Viewcards from "../../components/viewcards.astro";
+import type { Deck } from "../../assets/types";
+
+const userid = await Astro.session?.get("userid");
+const { id } = Astro.params;
+
+
+if(!userid) {
+  return Astro.redirect('/login');
+}
+
+const deck = await pool
+  .execute("SELECT * FROM Decks WHERE DeckId = ?", [id])
+  .then(([rows]) => (rows as Deck[])[0]);
+
+if(!deck) {
+  return Astro.redirect('/');
+}
+
+if(Number(userid) !== deck.UserId) {
+  return Astro.redirect('/');
+}
+
+---
+
+<Navbar>
+  <Viewcards server:defer deckId={id} />
+</Navbar>

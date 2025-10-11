@@ -1,13 +1,7 @@
 ---
 import { pool } from "../libs/db";
 
-interface Deck {
-  DeckId: number;
-  UserId: number;
-  Title: string;
-  Length: number;
-  CreatedAt: Date;
-}
+import type { Deck } from "../assets/types";
 
 const userid = await Astro.session?.get("userid");
 let decks: Deck[] = [];
@@ -25,7 +19,7 @@ if (userid) {
     decks.map((deck) => (
       <div class="flex flex-col p-2 bg-gray-400 rounded-xl w-5/6 h-20 justify-center my-2">
         <h2 class="text-gray-700 text-sm">Count: {deck.Length}</h2>
-        <h1 class="text-black text-5xl">{deck.Title}</h1>
+        <a href={`/view/${deck.DeckId}`} class="text-black text-5xl">{deck.Title}</a>
       </div>
     ))
   }
