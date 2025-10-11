@@ -9,23 +9,21 @@ import type { Deck } from "../../assets/types";
 const userid = await Astro.session?.get("userid");
 const { id } = Astro.params;
 
-
-if(!userid) {
-  return Astro.redirect('/login');
+if (!userid) {
+  return Astro.redirect("/login");
 }
 
 const deck = await pool
   .execute("SELECT * FROM Decks WHERE DeckId = ?", [id])
   .then(([rows]) => (rows as Deck[])[0]);
 
-if(!deck) {
-  return Astro.redirect('/');
+if (!deck) {
+  return Astro.redirect("/");
 }
 
-if(Number(userid) !== deck.UserId) {
-  return Astro.redirect('/');
+if (Number(userid) !== deck.UserId) {
+  return Astro.redirect("/");
 }
-
 ---
 
 <Navbar>
