@@ -10,11 +10,11 @@ export function cardHTML(num: number) {
           <textarea
             placeholder="Side 1"
             class="p-3 mr-2 min-h-24 w-1/2 rounded-2xl bg-gray-600 resize-none overflow-hidden text-white"
-            rows="3"></textarea>
+            rows="3" maxLength="500"></textarea>
           <textarea
             placeholder="Side 2"
             class="p-3 ml-2 min-h-24 w-1/2 rounded-2xl bg-gray-600 resize-none overflow-hidden text-white"
-            rows="3"></textarea>
+            rows="3" maxLength="500"></textarea>
         </div>
       `;
 }

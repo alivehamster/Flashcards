@@ -18,7 +18,7 @@ export const server = {
     }),
     handler: async (input, context) => {
       try {
-        if(input.title.length > 500) {
+        if(input.title.length > 100) {
           return { status: "error", message: "Title too long" };
         }
         const userId = await context.session?.get("userid");
