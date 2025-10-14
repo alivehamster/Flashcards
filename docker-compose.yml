@@ -1,0 +1,21 @@
+services:
+  flashcards:
+    restart: always
+    build:
+      context: ./
+      args:
+        - DB_HOST=mariaDB
+        - DB_USER=root
+        - DB_PASSWORD=example
+        - DB_NAME=flashcards
+    ports:
+      - '8080:4321'
+    depends_on:
+      - mariaDB
+  mariaDB:
+    restart: always
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+    volumes:
+      - ./mariadb_data:/var/lib/mysql

@@ -9,10 +9,10 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/node": "^9.4.4",
+    "@astrojs/node": "^9.5.0",
     "@tailwindcss/vite": "^4.1.14",
     "@types/bcrypt": "^6.0.0",
-    "astro": "^5.14.1",
+    "astro": "^5.14.5",
     "bcrypt": "^6.0.0",
     "email-validator": "^2.0.4",
     "mysql2": "^3.15.2",

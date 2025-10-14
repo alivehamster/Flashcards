@@ -1,7 +1,9 @@
 ---
-import { pool } from "../libs/db";
+import { getPool } from "../libs/db";
+const pool = await getPool();
 
 import type { Deck } from "../assets/types";
+
 
 const userid = await Astro.session?.get("userid");
 let decks: Deck[] = [];

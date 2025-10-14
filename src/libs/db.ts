@@ -1,20 +1,29 @@
-import mysql from 'mysql2/promise';
+import mysql from "mysql2/promise";
 
-// Create connection pool
-export const pool = mysql.createPool({
-  host: import.meta.env.DB_HOST || 'localhost',
-  user: import.meta.env.DB_USER || 'root',
-  password: import.meta.env.DB_PASSWORD || '',
-  database: import.meta.env.DB_NAME || 'flashcards',
+const dbName = import.meta.env.DB_NAME || "flashcards";
+
+const poolConfig = {
+  host: import.meta.env.DB_HOST || "localhost",
+  user: import.meta.env.DB_USER || "root",
+  password: import.meta.env.DB_PASSWORD || "example",
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0
-});
+  queueLimit: 0,
+};
+
+let pool: mysql.Pool;
 
 async function initializeDatabase() {
   try {
+
+    const connection = await mysql.createConnection(poolConfig);
+
+    // Create database if it doesn't exist
+    await connection.execute(`CREATE DATABASE IF NOT EXISTS ${dbName}`);
+    await connection.execute(`USE ${dbName}`);
+
     // Create Accounts table
-    await pool.execute(`
+    await connection.execute(`
       CREATE TABLE IF NOT EXISTS Accounts (
         UserId INT AUTO_INCREMENT PRIMARY KEY,
         Email VARCHAR(255) UNIQUE NOT NULL,
@@ -25,7 +34,7 @@ async function initializeDatabase() {
     `);
 
     // Create Decks table
-    await pool.execute(`
+    await connection.execute(`
       CREATE TABLE IF NOT EXISTS Decks (
         DeckId INT AUTO_INCREMENT PRIMARY KEY,
         UserId INT NOT NULL,
@@ -37,7 +46,7 @@ async function initializeDatabase() {
     `);
 
     // Create Cards table
-    await pool.execute(`
+    await connection.execute(`
       CREATE TABLE IF NOT EXISTS Cards (
         CardId INT AUTO_INCREMENT PRIMARY KEY,
         DeckId INT NOT NULL,
@@ -48,12 +57,22 @@ async function initializeDatabase() {
       )
     `);
 
-    console.log('Database tables initialized successfully');
+    await connection.end();
+    console.log("Database and tables initialized successfully");
+
+    pool = mysql.createPool({
+      ...poolConfig,
+      database: dbName,
+    });
   } catch (error) {
-    console.error('Error initializing database:', error);
+    console.error("Error initializing database:", error);
     throw error;
   }
 }
 
-initializeDatabase()
-  
+export async function getPool(): Promise<mysql.Pool> {
+  if (!pool) {
+    await initializeDatabase();
+  }
+  return pool;
+}

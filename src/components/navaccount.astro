@@ -1,5 +1,6 @@
 ---
-import { pool } from "../libs/db";
+import { getPool } from "../libs/db";
+const pool = await getPool();
 
 const user = await Astro.session?.get("userid");
 let username = "Login";
@@ -19,6 +20,7 @@ if (user) {
 
 {
   user && (
+    <a href="/create" class="text-white hover:underline">Create</a>
     <button id="logout" class="text-white hover:underline hover:cursor-pointer">
       logout
     </button>

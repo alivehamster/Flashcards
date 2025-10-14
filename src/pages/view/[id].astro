@@ -1,6 +1,7 @@
 ---
 export const prerender = false;
-import { pool } from "../../libs/db";
+import { getPool } from "../../libs/db";
+const pool = await getPool();
 
 import Navbar from "../../layouts/nav.astro";
 import Viewcards from "../../components/viewcards.astro";

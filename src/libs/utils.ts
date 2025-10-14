@@ -1,5 +1,6 @@
 import evalidator from "email-validator";
-import { pool } from "./db";
+import { getPool } from "../libs/db";
+const pool = await getPool();
 
 export async function signupValidate(
   email: string,

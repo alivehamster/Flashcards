@@ -1,5 +1,7 @@
 ---
-import { pool } from "../libs/db";
+import { getPool } from "../libs/db";
+const pool = await getPool();
+
 import type { Card, Deck } from "../assets/types";
 
 const deckId = Astro.props.deckId as number;

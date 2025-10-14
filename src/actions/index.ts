@@ -1,6 +1,7 @@
 import { defineAction, ActionError } from "astro:actions";
 import { z } from "astro:schema";
-import { pool } from "../libs/db";
+import { getPool } from "../libs/db";
+const pool = await getPool();
 import bcrypt from "bcrypt";
 import { signupValidate } from "../libs/utils";
 import evalidator from "email-validator";
