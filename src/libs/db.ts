@@ -1,11 +1,11 @@
 import mysql from "mysql2/promise";
 
-const dbName = import.meta.env.DB_NAME || "flashcards";
+const dbName = process.env.DB_NAME || "flashcards";
 
 const poolConfig = {
-  host: import.meta.env.DB_HOST || "localhost",
-  user: import.meta.env.DB_USER || "root",
-  password: import.meta.env.DB_PASSWORD || "example",
+  host: process.env.DB_HOST || "localhost",
+  user: process.env.DB_USER || "root",
+  password: process.env.DB_PASSWORD || "example",
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,

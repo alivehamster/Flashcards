@@ -3,13 +3,13 @@ services:
     restart: always
     build:
       context: ./
-      args:
-        - DB_HOST=mariaDB
-        - DB_USER=root
-        - DB_PASSWORD=example
-        - DB_NAME=flashcards
     ports:
       - '8080:4321'
+    environment:
+      DB_HOST: mariaDB
+      DB_USER: root
+      DB_PASSWORD: example
+      DB_NAME: flashcards
     depends_on:
       - mariaDB
   mariaDB:
