@@ -2,7 +2,7 @@ import { defineAction, ActionError } from "astro:actions";
 import { z } from "astro:schema";
 import { getPool } from "../libs/db";
 const pool = await getPool();
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { signupValidate } from "../libs/utils";
 import evalidator from "email-validator";
 
