@@ -1,0 +1,27 @@
+{
+  "main": "dist/_worker.js/index.js",
+  "name": "flashcards",
+  "compatibility_date": "2025-10-27",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "./dist"
+  },
+  "observability": {
+    "enabled": true
+  },
+  "kv_namespaces": [
+    {
+      "binding": "SESSION",
+      // ID will be different
+      "id": "cc6dfa00556a494286b5c837fbfe0220"
+    }
+  ],
+  "hyperdrive": [
+    {
+      "binding": "MARIADB-HYPERDRIVE",
+      // ID will be different
+      "id": "a28462e2bde94db5a456f69ca928801c"
+    }
+  ]
+}
