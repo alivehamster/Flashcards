@@ -19,7 +19,7 @@
   ],
   "hyperdrive": [
     {
-      "binding": "MARIADB-HYPERDRIVE",
+      "binding": "HYPERDRIVE",
       // ID will be different
       "id": "a28462e2bde94db5a456f69ca928801c"
     }

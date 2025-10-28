@@ -1,17 +1,19 @@
-import mysql from "mysql2/promise";
+import {createConnection} from "mysql2/promise";
+import type { Connection } from "mysql2/promise";
+import type { APIContext } from "astro";
+import type { ActionAPIContext } from "astro:actions";
 
-export async function getPool(): Promise<mysql.Connection> {
-  // Can't be bothered to change function name to getConnection in all the files
-  // Assume database is already initialized
-
-  const connection = await mysql.createConnection({
-     host: env.HYPERDRIVE.host,
-     user: env.HYPERDRIVE.user,
-     password: env.HYPERDRIVE.password,
-     database: env.HYPERDRIVE.database,
-     port: env.HYPERDRIVE.port,
-
-     disableEval: true
+export async function getConnection(
+  context: APIContext | ActionAPIContext
+): Promise<Connection> {
+  const hyperdrive = context.locals.runtime.env.HYPERDRIVE;
+  const connection = await createConnection({
+    host: hyperdrive.host,
+    user: hyperdrive.user,
+    password: hyperdrive.password,
+    database: hyperdrive.database,
+    port: hyperdrive.port,
+    disableEval: true,
   });
 
   return connection;

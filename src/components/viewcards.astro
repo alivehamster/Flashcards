@@ -1,6 +1,6 @@
 ---
-import { getPool } from "../libs/db";
-const pool = await getPool();
+import { getConnection } from "../libs/db";
+const connection = await getConnection(Astro);
 
 import type { Card, Deck } from "../assets/types";
 
@@ -9,12 +9,12 @@ const userid = await Astro.session?.get("userid");
 let cards: Card[] = [];
 
 if (userid) {
-  const deck = await pool
+  const deck = await connection
     .execute("SELECT * FROM Decks WHERE DeckId = ?", [deckId])
     .then(([rows]) => (rows as Deck[])[0]);
 
   if (deck && Number(userid) === deck.UserId) {
-    const [rows] = await pool.execute(
+    const [rows] = await connection.execute(
       "SELECT CardId, Front, Back FROM Cards WHERE DeckId = ?",
       [deck.DeckId]
     );

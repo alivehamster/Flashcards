@@ -1,7 +1,7 @@
 ---
 export const prerender = false;
-import { getPool } from "../../libs/db";
-const pool = await getPool();
+import { getConnection } from "../../libs/db";
+const connection = await getConnection(Astro);
 
 import Navbar from "../../layouts/nav.astro";
 import Viewcards from "../../components/viewcards.astro";
@@ -14,7 +14,7 @@ if (!userid) {
   return Astro.redirect("/login");
 }
 
-const deck = await pool
+const deck = await connection
   .execute("SELECT * FROM Decks WHERE DeckId = ?", [id])
   .then(([rows]) => (rows as Deck[])[0]);
 

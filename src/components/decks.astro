@@ -1,18 +1,19 @@
 ---
-import { getPool } from "../libs/db";
-const pool = await getPool();
+import { getConnection } from "../libs/db";
 
 import type { Deck } from "../assets/types";
-
 
 const userid = await Astro.session?.get("userid");
 let decks: Deck[] = [];
 if (userid) {
-  const [rows] = await pool.execute(
+  const connection = await getConnection(Astro);
+
+  const [rows] = await connection.execute(
     "SELECT DeckId, Title, Length FROM Decks WHERE UserId = ?",
     [userid]
   );
   decks = rows as Deck[];
+  await connection.end();;
 }
 ---
 

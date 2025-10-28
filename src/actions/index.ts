@@ -1,7 +1,6 @@
 import { defineAction, ActionError } from "astro:actions";
 import { z } from "astro:schema";
-import { getPool } from "../libs/db";
-const pool = await getPool();
+import { getConnection } from "../libs/db";
 import bcrypt from "bcryptjs";
 import { signupValidate } from "../libs/utils";
 import evalidator from "email-validator";
@@ -27,7 +26,9 @@ export const server = {
           return { status: "error", message: "Not authenticated" };
         }
 
-        const [deckResult] = await pool.execute(
+        const connection = await getConnection(context);
+
+        const [deckResult] = await connection.execute(
           "INSERT INTO Decks (UserId, Title, Length) VALUES (?, ?, ?)",
           [userId, input.title, input.deck.length]
         );
@@ -36,11 +37,13 @@ export const server = {
 
         for (let i = 0; i < input.deck.length; i++) {
           const card = input.deck[i];
-          await pool.execute(
+          await connection.execute(
             "INSERT INTO Cards (DeckId, Position, Front, Back) VALUES (?, ?, ?, ?)",
             [deckId, i + 1, card.side1, card.side2]
           );
         }
+
+        await connection.end();
 
         return { status: "success" };
       } catch (error) {
@@ -75,24 +78,29 @@ export const server = {
     }),
     handler: async (input, context) => {
       try {
+        const connection = await getConnection(context);
+
         const validate = await signupValidate(
           input.email,
           input.username,
-          input.password
+          input.password,
+          connection
         );
         if (validate) {
+          await connection.end();;
           return { status: "error", message: validate };
         } else {
           const hash = await bcrypt.hash(
             input.password,
             Number(process.env.SALT_ROUNDS)
           );
-          const [result] = await pool.execute(
+          const [result] = await connection.execute(
             "INSERT INTO Accounts (Email, Username, PasswordHash) VALUES (?, ?, ?)",
             [input.email, input.username, hash]
           );
           const insertResult = result as any;
           context.session?.set("userid", insertResult.insertId.toString());
+          await connection.end();;
           return {
             status: "successful",
           };
@@ -119,8 +127,10 @@ export const server = {
           ? "SELECT UserId, Username, PasswordHash FROM Accounts WHERE Email = ?"
           : "SELECT UserId, Username, PasswordHash FROM Accounts WHERE Username = ?";
 
-        const [rows] = await pool.execute(query, [input.username]);
+        const connection = await getConnection(context);
+        const [rows] = await connection.execute(query, [input.username]);
         const accounts = rows as any[];
+        await connection.end();;
 
         if (accounts.length > 0) {
           acc = accounts[0];
