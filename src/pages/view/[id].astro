@@ -15,7 +15,7 @@ if (!userid) {
 }
 
 const deck = await connection
-  .execute("SELECT * FROM Decks WHERE DeckId = ?", [id])
+  .query("SELECT * FROM Decks WHERE DeckId = ?", [id])
   .then(([rows]) => (rows as Deck[])[0]);
 
 if (!deck) {

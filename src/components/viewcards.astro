@@ -10,11 +10,11 @@ let cards: Card[] = [];
 
 if (userid) {
   const deck = await connection
-    .execute("SELECT * FROM Decks WHERE DeckId = ?", [deckId])
+    .query("SELECT * FROM Decks WHERE DeckId = ?", [deckId])
     .then(([rows]) => (rows as Deck[])[0]);
 
   if (deck && Number(userid) === deck.UserId) {
-    const [rows] = await connection.execute(
+    const [rows] = await connection.query(
       "SELECT CardId, Front, Back FROM Cards WHERE DeckId = ?",
       [deck.DeckId]
     );

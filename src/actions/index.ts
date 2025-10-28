@@ -28,7 +28,7 @@ export const server = {
 
         const connection = await getConnection(context);
 
-        const [deckResult] = await connection.execute(
+        const [deckResult] = await connection.query(
           "INSERT INTO Decks (UserId, Title, Length) VALUES (?, ?, ?)",
           [userId, input.title, input.deck.length]
         );
@@ -37,13 +37,13 @@ export const server = {
 
         for (let i = 0; i < input.deck.length; i++) {
           const card = input.deck[i];
-          await connection.execute(
+          await connection.query(
             "INSERT INTO Cards (DeckId, Position, Front, Back) VALUES (?, ?, ?, ?)",
             [deckId, i + 1, card.side1, card.side2]
           );
         }
 
-        await connection.end();
+        context.locals.runtime.ctx.waitUntil(connection.end());
 
         return { status: "success" };
       } catch (error) {
@@ -87,20 +87,20 @@ export const server = {
           connection
         );
         if (validate) {
-          await connection.end();;
+          context.locals.runtime.ctx.waitUntil(connection.end());
           return { status: "error", message: validate };
         } else {
           const hash = await bcrypt.hash(
             input.password,
             Number(process.env.SALT_ROUNDS)
           );
-          const [result] = await connection.execute(
+          const [result] = await connection.query(
             "INSERT INTO Accounts (Email, Username, PasswordHash) VALUES (?, ?, ?)",
             [input.email, input.username, hash]
           );
           const insertResult = result as any;
           context.session?.set("userid", insertResult.insertId.toString());
-          await connection.end();;
+          context.locals.runtime.ctx.waitUntil(connection.end());
           return {
             status: "successful",
           };
@@ -128,9 +128,9 @@ export const server = {
           : "SELECT UserId, Username, PasswordHash FROM Accounts WHERE Username = ?";
 
         const connection = await getConnection(context);
-        const [rows] = await connection.execute(query, [input.username]);
+        const [rows] = await connection.query(query, [input.username]);
         const accounts = rows as any[];
-        await connection.end();;
+        context.locals.runtime.ctx.waitUntil(connection.end());
 
         if (accounts.length > 0) {
           acc = accounts[0];
