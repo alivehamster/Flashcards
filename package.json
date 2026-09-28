@@ -3,19 +3,22 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "dev": "astro dev",
+    "dev": "dotenv -- astro dev",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/node": "^9.5.0",
-    "@tailwindcss/vite": "^4.1.16",
+    "@astrojs/node": "^11.1.6",
+    "@tailwindcss/vite": "^4.3.3",
     "@types/bcrypt": "^6.0.0",
-    "astro": "^5.15.1",
+    "astro": "^7.3.3",
     "bcrypt": "^6.0.0",
     "email-validator": "^2.0.4",
-    "mysql2": "^3.15.3",
-    "tailwindcss": "^4.1.16"
+    "mysql2": "^3.24.4",
+    "tailwindcss": "^4.3.3"
+  },
+  "devDependencies": {
+    "dotenv-cli": "^11.0.0"
   }
 }
