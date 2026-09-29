@@ -22,7 +22,7 @@ if (user) {
   user && (
     <a href="/create" class="text-white hover:underline">Create</a>
     <button id="logout" class="text-white hover:underline hover:cursor-pointer">
-      logout
+      Logout
     </button>
   )
 }
@@ -34,7 +34,7 @@ if (user) {
   const logoutButton = document.getElementById("logout");
   if (logoutButton) {
     logoutButton.addEventListener("click", async () => {
-      await actions.logout();
+      await actions.logout({});
       window.location.href = "/";
     });
   }
