@@ -4,11 +4,41 @@ import { cardClass, cardHTML } from "../assets/createcard";
 ---
 
 <Navbar>
+  <dialog id="importmodal">
+    <div class="fixed inset-0 flex justify-center items-center">
+      <div
+        class="p-2 rounded-lg bg-gray-700 flex flex-col justify-center items-center"
+      >
+        <h1 class="text-white text-2xl">Import from Quizlet</h1>
+        <p class="text-white">
+          set "Between term and definition" to "Tab" and "Between rows" to "New
+          Line"
+        </p>
+        <textarea
+          id="quizlet-content"
+          class="w-200 h-100 rounded-2xl bg-gray-600 resize-none text-white"
+          rows="3"></textarea>
+        <div class="flex gap-2 mt-2">
+          <button
+            id="closeImport"
+            class="text-white bg-red-500 p-2 rounded-lg cursor-pointer"
+            >Close</button
+          >
+          <button
+            id="submitImport"
+            class="text-white bg-blue-400 p-2 rounded-lg cursor-pointer"
+            >Submit</button
+          >
+        </div>
+      </div>
+    </div>
+  </dialog>
+
   <div class="flex flex-col items-center justify-center">
     <h1 class="text-5xl font-bold text-white text-center mt-10">
       Create a New Deck:
     </h1>
-    <div class="flex p-3 m-3 w-2/3 bg-gray-400 rounded-2xl">
+    <div class="flex items-center p-3 m-3 w-2/3 bg-gray-400 rounded-2xl">
       <input
         id="deck-title"
         type="text"
@@ -17,6 +47,11 @@ import { cardClass, cardHTML } from "../assets/createcard";
         required
         maxlength="100"
       />
+      <button
+        id="showImport"
+        class="bg-blue-500 m-2 rounded-xl cursor-pointer text-white"
+        >Import from Quizlet</button
+      >
     </div>
 
     <div id="card-container" class="flex flex-col w-full h-full items-center">
@@ -42,7 +77,7 @@ import { cardClass, cardHTML } from "../assets/createcard";
 
 <script>
   import { actions } from "astro:actions";
-  import { cardClass, cardHTML } from "../assets/createcard";
+  import { cardClass, cardHTML, parseQuizlet } from "../assets/createcard";
   import { createNotification } from "../assets/createNotification";
 
   let cardCount = 1;
@@ -62,12 +97,14 @@ import { cardClass, cardHTML } from "../assets/createcard";
     createCard(cardCount);
   });
 
-  function createCard(num: number) {
+  function createCard(num: number, side1: string = "", side2: string = "") {
     const newCard = document.createElement("div");
     newCard.className = cardClass;
     newCard.innerHTML = cardHTML(num);
-
     const textareas = newCard.querySelectorAll("textarea");
+    textareas[0].value = side1;
+    textareas[1].value = side2;
+    
     textareas.forEach((textarea) => {
       textarea.addEventListener("input", () => autoResize(textarea));
     });
@@ -79,6 +116,33 @@ import { cardClass, cardHTML } from "../assets/createcard";
     textarea.style.height = "auto";
     textarea.style.height = textarea.scrollHeight + "px";
   }
+
+  const dialog: HTMLDialogElement = document.getElementById(
+    "importmodal",
+  ) as HTMLDialogElement;
+
+  document.getElementById("showImport")?.addEventListener("click", () => {
+    dialog.showModal();
+  });
+
+  document.getElementById("closeImport")?.addEventListener("click", () => {
+    dialog.close();
+  });
+
+  const importTextarea = document.getElementById("quizlet-content") as HTMLTextAreaElement;
+
+  document.getElementById("submitImport")?.addEventListener("click", () => {
+    cardContainer?.replaceChildren();
+    cardCount = 0
+
+    const cards = parseQuizlet(importTextarea.value);
+    cards.forEach((card) => {
+      cardCount++;
+      createCard(cardCount, card.Front, card.Back);
+    });
+
+    dialog.close();
+  });
 
   document
     .getElementById("create-deck")
@@ -103,7 +167,7 @@ import { cardClass, cardHTML } from "../assets/createcard";
       } else {
         createNotification(
           "Error creating deck: " + response.data?.message || "Unknown error",
-          3000
+          3000,
         );
       }
     });

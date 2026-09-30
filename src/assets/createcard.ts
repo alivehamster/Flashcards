@@ -1,3 +1,5 @@
+import type {Card } from "./types"
+
 export const cardClass =
   "flex flex-col w-2/3 min-h-40 p-3 m-3 bg-gray-400 rounded-2xl card";
 
@@ -17,4 +19,17 @@ export function cardHTML(num: number) {
             rows="3" maxLength="500"></textarea>
         </div>
       `;
+}
+
+
+export function parseQuizlet(text: string): Pick<Card, "Front" | "Back">[] {
+  return text.split(/\r?\n/).flatMap((line) => {
+    const separatorIndex = line.indexOf("\t");
+    if (separatorIndex === -1) return [];
+
+    return [{
+      Front: line.slice(0, separatorIndex),
+      Back: line.slice(separatorIndex + 1),
+    }];
+  });
 }
