@@ -1,0 +1,198 @@
+---
+export const prerender = false;
+import "../../assets/cardanimations.css";
+
+import { getPool } from "../../libs/db";
+const pool = await getPool();
+
+import { shuffleAnswers } from "../../assets/shuffleanswers";
+
+import Navbar from "../../layouts/nav.astro";
+import type { Card, Deck } from "../../assets/types";
+
+const { id } = Astro.params;
+if (!id) {
+  return Astro.redirect("/");
+}
+
+const userid = await Astro.session?.get("userid");
+if (!userid) {
+  return Astro.redirect("/login");
+}
+
+const deck = await pool
+  .execute("SELECT * FROM Decks WHERE DeckId = ?", [id])
+  .then(([rows]) => (rows as Deck[])[0]);
+
+if (!deck) {
+  return Astro.redirect("/");
+}
+
+if (Number(userid) !== deck.UserId) {
+  return Astro.redirect("/");
+}
+
+let cards: Card[] = [];
+
+const [rows] = await pool.execute(
+  "SELECT CardId, Front, Back FROM Cards WHERE DeckId = ?",
+  [deck.DeckId],
+);
+
+cards = rows as Card[];
+const answers: string[] = shuffleAnswers(cards, cards[0]?.Front);
+---
+
+<Navbar>
+  <div
+    data-cards={JSON.stringify(cards)}
+    class="flex flex-col justify-center items-center w-full h-full"
+  >
+    <div
+      id="flashcard"
+      class="bg-gray-300 w-148 h-80 flex justify-center items-center p-4 rounded-lg"
+      tabindex="0"
+    >
+      <p
+        id="card-content"
+        class="wrap-break-words hyphens-auto text-center w-full"
+      >
+        {cards[0]?.Back}
+      </p>
+    </div>
+    <div class="flex flex-col mt-2">
+      <div class="flex my-2 gap-4">
+        {
+          answers[0] !== undefined && (
+            <button
+              id="button1"
+              class="h-10 w-70 bg-gray-400 rounded-lg cursor-pointer hover:bg-gray-500"
+            >
+              {answers[0]}
+            </button>
+          )
+        }
+
+        {
+          answers[1] !== undefined && (
+            <button
+              id="button2"
+              class="h-10 w-70 bg-gray-400 rounded-lg cursor-pointer hover:bg-gray-500"
+            >
+              {answers[1]}
+            </button>
+          )
+        }
+      </div>
+      <div class="flex my-2 gap-4">
+        {
+          answers[2] !== undefined && (
+            <button
+              id="button3"
+              class="h-10 w-70 bg-gray-400 rounded-lg cursor-pointer hover:bg-gray-500"
+            >
+              {answers[2]}
+            </button>
+          )
+        }
+        {
+          answers[3] !== undefined && (
+            <button
+              id="button4"
+              class="h-10 w-70 bg-gray-400 rounded-lg cursor-pointer hover:bg-gray-500"
+            >
+              {answers[3]}
+            </button>
+          )
+        }
+      </div>
+    </div>
+  </div>
+</Navbar>
+
+<script>
+  import { shuffleAnswers } from "../../assets/shuffleanswers";
+
+  const cards = JSON.parse(
+    (document.querySelector("div[data-cards]") as HTMLElement)?.dataset.cards ||
+      "[]",
+  );
+
+  let currentcards = cards;
+
+  let isAnimating = false;
+
+  const button1 = document.getElementById("button1") as HTMLButtonElement;
+  const button2 = document.getElementById("button2") as HTMLButtonElement;
+  const button3 = document.getElementById("button3") as HTMLButtonElement;
+  const button4 = document.getElementById("button4") as HTMLButtonElement;
+
+  const flashcard = document.getElementById("flashcard");
+  const cardContent = document.getElementById("card-content");
+
+  function shuffle(answer: string) {
+    const answers = shuffleAnswers(cards, answer);
+
+    if (button1) button1.textContent = answers[0] || "";
+    if (button2) button2.textContent = answers[1] || "";
+    if (button3) button3.textContent = answers[2] || "";
+    if (button4) button4.textContent = answers[3] || "";
+  }
+
+  function checkAnswer(button: HTMLButtonElement) {
+    if (currentcards[0].Front === button.textContent) {
+      alert("Correct!");
+      currentcards.shift();
+      nextQuestion();
+    } else {
+      alert("Incorrect!");
+      currentcards.push(currentcards.shift());
+      nextQuestion();
+    }
+  }
+
+  function nextQuestion() {
+    if (currentcards.length === 0 || isAnimating) return;
+
+    if (currentcards.length === 0) {
+      alert("done");
+      return;
+    }
+
+    isAnimating = true;
+    const slideOutClass = "slide-out-left";
+    const slideInClass = "slide-in-right";
+
+    flashcard?.classList.add(slideOutClass);
+
+    setTimeout(() => {
+      const currentCard = currentcards[0];
+      if (cardContent) {
+        cardContent.textContent = currentCard.Back;
+      }
+
+      flashcard?.classList.remove(slideOutClass);
+      flashcard?.classList.add(slideInClass);
+    }, 300);
+
+    setTimeout(() => {
+      shuffle(currentcards[0].Front);
+
+      flashcard?.classList.remove(slideInClass);
+      isAnimating = false;
+    }, 600);
+  }
+
+  button1?.addEventListener("click", function () {
+    checkAnswer(this as HTMLButtonElement);
+  });
+  button2?.addEventListener("click", function () {
+    checkAnswer(this as HTMLButtonElement);
+  });
+  button3?.addEventListener("click", function () {
+    checkAnswer(this as HTMLButtonElement);
+  });
+  button4?.addEventListener("click", function () {
+    checkAnswer(this as HTMLButtonElement);
+  });
+</script>
