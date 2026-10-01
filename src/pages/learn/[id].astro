@@ -118,7 +118,7 @@ const answers: string[] = shuffleAnswers(cards, cards[0]?.Front);
       "[]",
   );
 
-  let currentcards = cards;
+  let currentcards = [...cards];
 
   let isAnimating = false;
 
@@ -152,7 +152,7 @@ const answers: string[] = shuffleAnswers(cards, cards[0]?.Front);
   }
 
   function nextQuestion() {
-    if (currentcards.length === 0 || isAnimating) return;
+    if (isAnimating) return;
 
     if (currentcards.length === 0) {
       alert("done");
