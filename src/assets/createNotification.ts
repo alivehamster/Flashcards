@@ -14,3 +14,19 @@ export function createNotification(message: string, time: number) {
     notification.remove();
   }, time);
 }
+
+export function createCardNotification(message: string, color: string, time: number) {
+  const notification = document.createElement("div");
+  notification.className =
+    `fixed inset-0 w-full h-6 flex justify-center items-center text-white`;
+  notification.style.backgroundColor = color;
+  notification.innerHTML = `
+      <p class="font-bold text-white">${message}</p>
+  `;
+
+  document.body.appendChild(notification);
+
+  setTimeout(() => {
+    notification.remove();
+  }, time);
+}

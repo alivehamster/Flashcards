@@ -112,6 +112,7 @@ const answers: string[] = shuffleAnswers(cards, cards[0]?.Front);
 
 <script>
   import { shuffleAnswers } from "../../assets/shuffleanswers";
+  import { createCardNotification } from "../../assets/createNotification";
 
   const cards = JSON.parse(
     (document.querySelector("div[data-cards]") as HTMLElement)?.dataset.cards ||
@@ -141,13 +142,23 @@ const answers: string[] = shuffleAnswers(cards, cards[0]?.Front);
 
   function checkAnswer(button: HTMLButtonElement) {
     if (currentcards[0].Front === button.textContent) {
-      alert("Correct!");
+      button.style.backgroundColor = "green";
       currentcards.shift();
-      nextQuestion();
+      createCardNotification("Correct", "green", 1500);
+
+      setTimeout(() => {
+        button.style.backgroundColor = "";
+        nextQuestion();
+      }, 1500);
     } else {
-      alert("Incorrect!");
+      button.style.backgroundColor = "red";
       currentcards.push(currentcards.shift());
-      nextQuestion();
+      createCardNotification("Incorrect", "red", 1500);
+
+      setTimeout(() => {
+        button.style.backgroundColor = "";
+        nextQuestion();
+      }, 1500);
     }
   }
 
