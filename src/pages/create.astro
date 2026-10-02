@@ -104,7 +104,7 @@ import { cardClass, cardHTML } from "../assets/createcard";
     const textareas = newCard.querySelectorAll("textarea");
     textareas[0].value = side1;
     textareas[1].value = side2;
-    
+
     textareas.forEach((textarea) => {
       textarea.addEventListener("input", () => autoResize(textarea));
     });
@@ -129,11 +129,13 @@ import { cardClass, cardHTML } from "../assets/createcard";
     dialog.close();
   });
 
-  const importTextarea = document.getElementById("quizlet-content") as HTMLTextAreaElement;
+  const importTextarea = document.getElementById(
+    "quizlet-content",
+  ) as HTMLTextAreaElement;
 
   document.getElementById("submitImport")?.addEventListener("click", () => {
     cardContainer?.replaceChildren();
-    cardCount = 0
+    cardCount = 0;
 
     const cards = parseQuizlet(importTextarea.value);
     cards.forEach((card) => {

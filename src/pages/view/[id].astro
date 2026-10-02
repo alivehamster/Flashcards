@@ -38,6 +38,27 @@ const [rows] = await pool.execute(
 );
 cards = rows as Card[];
 
+let latestDeckIds: number[] = [];
+
+try {
+  const parsed: unknown = Astro.cookies.get("latestDecks")?.json() ?? [];
+  if (Array.isArray(parsed)) {
+    latestDeckIds = parsed.filter(
+      (deckId): deckId is number => Number.isInteger(deckId),
+    );
+  }
+} catch {
+  latestDeckIds = [];
+}
+
+Astro.cookies.set(
+  "latestDecks",
+  JSON.stringify([...new Set([deck.DeckId, ...latestDeckIds])].slice(0, 3)),
+  {
+    path: "/",
+    httpOnly: true,
+  },
+);
 ---
 
 <Navbar>

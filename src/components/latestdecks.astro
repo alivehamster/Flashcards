@@ -1,0 +1,46 @@
+---
+import type { Deck } from "../assets/types";
+
+interface Props {
+  decks: Deck[];
+}
+
+const { decks } = Astro.props;
+
+let latestDeckIds: number[] = [];
+
+try {
+  const parsed: unknown = Astro.cookies.get("latestDecks")?.json() ?? [];
+  if (Array.isArray(parsed)) {
+    latestDeckIds = parsed.filter(
+      (deckId): deckId is number => Number.isInteger(deckId),
+    );
+  }
+} catch {
+  latestDeckIds = [];
+}
+
+const latestDecks = latestDeckIds
+  .map((deckId) => decks.find((deck) => deck.DeckId === deckId))
+  .filter((deck): deck is Deck => deck !== undefined);
+
+---
+{ latestDecks.length > 0 && (
+<h1 class="text-5xl font-bold text-white text-center mt-10">Latest:</h1>
+<div
+  class="grid justify-center w-full grid-cols-[repeat(auto-fill,minmax(288px,300px))] gap-2 mt-5"
+>
+  {
+    latestDecks.map((deck) => (
+      <a class="flex justify-center" href={`/view/${deck.DeckId}`}>
+        <div class="flex flex-col p-2 bg-gray-400 rounded-xl w-72 h-72 justify-center my-2">
+          <h2 class="text-gray-700 text-sm">Count: {deck.Length}</h2>
+          <h1 class="text-2xl text-start wrap-break-words overflow-hidden">
+            {deck.Title}
+          </h1>
+        </div>
+      </a>
+    ))
+  }
+</div>
+)}
