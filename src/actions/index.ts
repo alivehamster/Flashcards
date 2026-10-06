@@ -147,4 +147,27 @@ export const server = {
       }
     },
   }),
+    deleteDeck: defineAction({
+    input: z.object({
+      id: z.number().min(0),
+    }),
+    handler: async (input, context) => {
+      try {
+        const [result] = await pool.execute(
+          "DELETE FROM Decks WHERE DeckId = ?",
+          [input.id]
+        );
+        return {
+          status: "successful",
+        };
+
+      } catch (error) {
+        console.warn(error);
+        throw new ActionError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Internal Server Error",
+        });
+      }
+    },
+  }),
 };

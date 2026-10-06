@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig } from "astro/config";
+import { defineConfig, fontProviders } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 
 import node from "@astrojs/node";
@@ -9,6 +9,14 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
   },
+
+  fonts: [
+    {
+      provider: fontProviders.googleicons(),
+      name: "Material Symbols Outlined",
+      cssVariable: "--font-material-symbols",
+    },
+  ],
 
   adapter: node({
     mode: "standalone",

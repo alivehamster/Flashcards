@@ -29,16 +29,121 @@ if (userid) {
     >
       {
         decks.map((deck) => (
-          <a class="flex justify-center" href={`/view/${deck.DeckId}`}>
-            <div class="flex flex-col p-2 bg-gray-400 rounded-xl w-72 h-72 justify-center my-2">
+          <div class="relative my-2 w-72 justify-self-center">
+            <a
+              class="flex flex-col p-2 bg-gray-400 rounded-xl w-72 h-72 justify-center"
+              href={`/view/${deck.DeckId}`}
+            >
               <h2 class="text-gray-700 text-sm">Count: {deck.Length}</h2>
               <h1 class="text-2xl text-start wrap-break-words overflow-hidden">
                 {deck.Title}
               </h1>
+            </a>
+            <div class="absolute top-2 right-2 z-10 p-0.5 hover:bg-gray-500 rounded-4xl">
+              <button
+                type="button"
+                data-menu-toggle
+                data-deck-id={deck.DeckId}
+                aria-expanded="false"
+                aria-controls={`deck-menu-${deck.DeckId}`}
+                aria-label={`More options for ${deck.Title}`}
+                class="hover:cursor-pointer"
+              >
+                <span class="material-symbols-outlined text-2xl">
+                  more_vert
+                </span>
+              </button>
+              <div
+                id={`deck-menu-${deck.DeckId}`}
+                data-deck-menu
+                hidden
+                class="absolute right-0 top-full mt-2 min-w-32 rounded bg-white py-1 text-gray-800 shadow-lg"
+              >
+                <a
+                  class="block px-4 py-2 hover:bg-gray-100"
+                  href={`/view/${deck.DeckId}`}
+                >
+                  View
+                </a>
+                <a
+                  class="block px-4 py-2 hover:bg-gray-100"
+                  href={`/learn/${deck.DeckId}`}
+                >
+                  Learn
+                </a>
+                <button
+                  class="block w-full text-left px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                  data-delete-deck-id={deck.DeckId}
+                >
+                  Delete
+                </button>
+              </div>
             </div>
-          </a>
+          </div>
         ))
       }
     </div>
   </div>
 </Navbar>
+
+<script>
+  import { actions } from "astro:actions";
+  import { createNotification } from "../assets/createNotification";
+
+  const menuToggles = Array.from(
+    document.querySelectorAll<HTMLButtonElement>("[data-menu-toggle]"),
+  );
+
+  function closeMenus() {
+    menuToggles.forEach((button) => {
+      const menuId = button.getAttribute("aria-controls");
+      const menu = menuId ? document.getElementById(menuId) : null;
+      if (menu) menu.hidden = true;
+      button.setAttribute("aria-expanded", "false");
+    });
+  }
+
+  menuToggles.forEach((button) => {
+    button.addEventListener("click", async (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const menuId = button.getAttribute("aria-controls");
+      const menu = menuId ? document.getElementById(menuId) : null;
+      if (!menu) return;
+
+      const shouldOpen = menu.hidden;
+      closeMenus();
+      menu.hidden = !shouldOpen;
+      button.setAttribute("aria-expanded", String(shouldOpen));
+    });
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!(event.target instanceof Element)) return;
+    if (!event.target.closest("[data-menu-toggle], [data-deck-menu]")) {
+      closeMenus();
+    }
+  });
+
+  const deleteButtons = Array.from(
+    document.querySelectorAll<HTMLButtonElement>("[data-delete-deck-id]"),
+  );
+
+  deleteButtons.forEach((button) => {
+    button.addEventListener("click", async (event) => {
+      event.preventDefault();
+      const deckId = button.getAttribute("data-delete-deck-id");
+      if (!deckId) return;
+      const response = await actions.deleteDeck({ id: Number(deckId) });
+      if (response.data?.status === "successful") window.location.reload();
+      else createNotification("Error: Failed to delete deck", 3000);
+    });
+  });
+</script>
+
+<style>
+  .material-symbols-outlined {
+    font-family: var(--font-material-symbols);
+  }
+</style>

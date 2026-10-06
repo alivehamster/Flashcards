@@ -30,13 +30,11 @@ if (Number(userid) !== deck.UserId) {
   return Astro.redirect("/");
 }
 
-let cards: Card[] = [];
-
 const [rows] = await pool.execute(
   "SELECT CardId, Front, Back FROM Cards WHERE DeckId = ?",
   [deck.DeckId]
 );
-cards = rows as Card[];
+const cards = rows as Card[];
 
 let latestDeckIds: number[] = [];
 
