@@ -37,7 +37,16 @@ const [rows] = await pool.execute(
   [deck.DeckId],
 );
 
-const cards = rows as Card[];
+const doshuffle = Astro.url.searchParams.get("shuffle") === "true";
+
+let cards: Card[] = [];
+
+if (doshuffle) {
+  cards = (rows as Card[]).sort(() => Math.random() - 0.5);
+} else {
+  cards = rows as Card[];
+} 
+
 const answers: string[] = shuffleAnswers(cards, cards[0]?.Front);
 ---
 
