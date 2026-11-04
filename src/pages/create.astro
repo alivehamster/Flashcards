@@ -9,11 +9,19 @@ import { cardClass, cardHTML } from "../assets/createcard";
       <div
         class="p-2 rounded-lg bg-gray-700 flex flex-col justify-center items-center"
       >
-        <h1 class="text-white text-2xl">Import from Quizlet</h1>
-        <p class="text-white">
-          set "Between term and definition" to "Tab" and "Between rows" to "New
-          Line"
-        </p>
+        <h1 class="text-white text-2xl">Import</h1>
+        <div class="flex gap-2">
+          <span>
+          <input type="radio" name="import-option" value="json" checked />
+          <label class="text-white">Default: JSON</label>
+          </span>
+          <span>
+          <input type="radio" name="import-option" value="quizlet" />
+          <label class="text-white"
+            >Quizlet: Tab between term and definition, New Line between rows</label
+          >
+          </span>
+        </div>
         <textarea
           id="quizlet-content"
           class="w-200 h-100 rounded-2xl bg-gray-600 resize-none text-white"
@@ -49,8 +57,8 @@ import { cardClass, cardHTML } from "../assets/createcard";
       />
       <button
         id="showImport"
-        class="bg-blue-500 m-2 rounded-xl cursor-pointer text-white"
-        >Import from Quizlet</button
+        class="bg-blue-500 m-2 p-3 rounded-xl cursor-pointer text-white"
+        >Import</button
       >
     </div>
 
@@ -79,6 +87,7 @@ import { cardClass, cardHTML } from "../assets/createcard";
   import { actions } from "astro:actions";
   import { cardClass, cardHTML, parseQuizlet } from "../assets/createcard";
   import { createNotification } from "../assets/createNotification";
+  import type { Card } from "../assets/types";
 
   let cardCount = 1;
 
@@ -137,7 +146,14 @@ import { cardClass, cardHTML } from "../assets/createcard";
     cardContainer?.replaceChildren();
     cardCount = 0;
 
-    const cards = parseQuizlet(importTextarea.value);
+    const importType = document.querySelector('input[name="import-option"]:checked') as HTMLInputElement;
+
+    let cards: Pick<Card, "Front" | "Back">[];
+    if (importType?.value === "quizlet") {
+      cards = parseQuizlet(importTextarea.value);
+    } else {
+      cards = JSON.parse(importTextarea.value);
+    }
     cards.forEach((card) => {
       cardCount++;
       createCard(cardCount, card.Front, card.Back);

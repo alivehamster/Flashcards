@@ -31,10 +31,10 @@ if (Number(userid) !== deck.UserId) {
 }
 
 const [rows] = await pool.execute(
-  "SELECT CardId, Front, Back FROM Cards WHERE DeckId = ?",
+  "SELECT Front, Back FROM Cards WHERE DeckId = ?",
   [deck.DeckId]
 );
-const cards = rows as Card[];
+const cards = rows as Pick<Card, "Front" | "Back">[];
 
 let latestDeckIds: number[] = [];
 
@@ -60,10 +60,39 @@ Astro.cookies.set(
 ---
 
 <Navbar>
-<div class="flex justify-center m-2">
+
+    <dialog id="exportmodal">
+    <div class="fixed inset-0 flex justify-center items-center">
+      <div
+        class="p-2 rounded-lg bg-gray-700 flex flex-col justify-center items-center"
+      >
+        <h1 class="text-white text-2xl">Export</h1>
+        <p
+          id="modal-content"
+          class="w-200 h-100 overflow-auto whitespace-pre-wrap rounded-2xl bg-gray-600 text-white"
+        ></p>
+        <div class="flex gap-2 mt-2">
+          <button onclick="navigator.clipboard.writeText(document.getElementById('modal-content').textContent || '')"
+            class="text-white bg-blue-500 p-2 rounded-lg cursor-pointer"
+            >Copy</button
+          >
+                    <button
+            id="closeexport"
+            class="text-white bg-red-500 p-2 rounded-lg cursor-pointer"
+            >Close</button
+          >
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+<div class="flex justify-center m-2 gap-2">
   <a class="p-2 px-10 bg-gray-200 rounded-2xl" href={`/learn/${deck.DeckId}`}>
     Learn
   </a> 
+  <button id="showExport" class="p-2 px-10 bg-gray-200 rounded-2xl hover:cursor-pointer">
+    Export
+  </button>
 </div>
 <div
   data-cards={JSON.stringify(cards)}
@@ -88,6 +117,20 @@ Astro.cookies.set(
     (document.querySelector("div[data-cards]") as HTMLElement)?.dataset.cards ||
       "[]"
   );
+
+    const dialog: HTMLDialogElement = document.getElementById(
+    "exportmodal",
+  ) as HTMLDialogElement;
+
+  document.getElementById("showExport")?.addEventListener("click", () => {
+    document.getElementById("modal-content")!.textContent = JSON.stringify(cards, null, 2);
+    dialog.showModal();
+  });
+
+  document.getElementById("closeexport")?.addEventListener("click", () => {
+    dialog.close();
+  });
+
 
   let currentCardIndex = 0;
   let showingFront = true;
