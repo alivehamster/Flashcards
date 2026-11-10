@@ -12,12 +12,12 @@ import { cardClass, cardHTML } from "../assets/createcard";
         <h1 class="text-white text-2xl">Import</h1>
         <div class="flex gap-2">
           <span>
-          <input type="radio" name="import-option" value="json" checked />
-          <label class="text-white">Default: JSON</label>
+          <input id="import-json" type="radio" name="import-option" value="json" checked />
+          <label for="import-json" class="text-white">Default: JSON</label>
           </span>
           <span>
-          <input type="radio" name="import-option" value="quizlet" />
-          <label class="text-white"
+          <input id="import-quizlet" type="radio" name="import-option" value="quizlet" />
+          <label for="import-quizlet" class="text-white"
             >Quizlet: Tab between term and definition, New Line between rows</label
           >
           </span>
@@ -165,6 +165,16 @@ import { cardClass, cardHTML } from "../assets/createcard";
   document
     .getElementById("create-deck")
     ?.addEventListener("click", async () => {
+
+            const deckTitle = (
+        document.getElementById("deck-title") as HTMLInputElement
+      )?.value;
+
+      if (!deckTitle) {
+        createNotification("Deck title is required", 3000);
+        return;
+      }
+
       const cards = document.querySelectorAll(".card");
       const deck = Array.from(cards).map((card) => {
         const textareas = card.querySelectorAll("textarea");
@@ -173,9 +183,6 @@ import { cardClass, cardHTML } from "../assets/createcard";
           side2: (textareas[1] as HTMLTextAreaElement).value,
         };
       });
-      const deckTitle = (
-        document.getElementById("deck-title") as HTMLInputElement
-      )?.value;
       const response = await actions.createDeck({
         title: deckTitle,
         deck: deck,
